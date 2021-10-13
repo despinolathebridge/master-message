@@ -5,6 +5,8 @@ import com.mock.ncb.event.BalanceTransferP2PEvent;
 import com.mock.ncb.event.FirstAccountBalanceEvent;
 import com.mock.ncb.event.LedgerAccountCreatedEvent;
 import com.mock.ncb.event.MessageCreatedEvent;
+import com.mock.ncb.event.TransferApprovedEvent;
+import com.mock.ncb.event.TransferRejectedEvent;
 import com.mock.ncb.event.TransferTopUpEvent;
 import com.mock.ncb.event.UserActivatedEvent;
 import com.mock.ncb.event.UserCreatedEvent;
@@ -65,5 +67,17 @@ public class KafkaTopicController {
     public ResponseEntity<ResponseKafkaDto> publishTopup(@RequestBody TransferTopUpEvent event) {
         kafkaProducer.publishTopUp(event);
         return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+    
+    @PostMapping("/transferApproved")
+    public ResponseEntity<ResponseKafkaDto> transferApprove(@RequestBody TransferApprovedEvent event) {
+    	kafkaProducer.transferApprove(event);
+    	return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+    
+    @PostMapping("/transferFailed")
+    public ResponseEntity<ResponseKafkaDto> transferFailed(@RequestBody TransferRejectedEvent event) {
+    	kafkaProducer.transferFailed(event);
+    	return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
     }
 }
