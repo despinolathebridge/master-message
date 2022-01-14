@@ -1,11 +1,17 @@
 package com.mock.ncb.controller;
 
 import com.mock.ncb.dto.ResponseKafkaDto;
+import com.mock.ncb.event.AchCashOutEnrichedEvent;
+import com.mock.ncb.event.AchTransferCompletedEvent;
+import com.mock.ncb.event.BalanceNCBCashInEvent;
 import com.mock.ncb.event.BalanceTransferP2PEvent;
+import com.mock.ncb.event.BalanceUpdateEvent;
+import com.mock.ncb.event.EcommerceCashInEvent;
 import com.mock.ncb.event.FirstAccountBalanceEvent;
 import com.mock.ncb.event.LedgerAccountCreatedEvent;
 import com.mock.ncb.event.MessageCreatedEvent;
 import com.mock.ncb.event.TransferApprovedEvent;
+import com.mock.ncb.event.TransferCashOutEvent;
 import com.mock.ncb.event.TransferRejectedEvent;
 import com.mock.ncb.event.TransferTopUpEvent;
 import com.mock.ncb.event.UserActivatedEvent;
@@ -68,16 +74,52 @@ public class KafkaTopicController {
         kafkaProducer.publishTopUp(event);
         return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
     }
-    
+
     @PostMapping("/transferApproved")
     public ResponseEntity<ResponseKafkaDto> transferApprove(@RequestBody TransferApprovedEvent event) {
     	kafkaProducer.transferApprove(event);
     	return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
     }
-    
+
     @PostMapping("/transferFailed")
     public ResponseEntity<ResponseKafkaDto> transferFailed(@RequestBody TransferRejectedEvent event) {
     	kafkaProducer.transferFailed(event);
     	return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+
+    @PostMapping("/balance-etop")
+    public ResponseEntity<ResponseKafkaDto> transferFailed(@RequestBody EcommerceCashInEvent event) {
+        kafkaProducer.addBalanceETop(event);
+        return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+
+    @PostMapping("/balance-cashin")
+    public ResponseEntity<ResponseKafkaDto> transferFailed(@RequestBody BalanceNCBCashInEvent event) {
+        kafkaProducer.addBalanceCashIn(event);
+        return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+
+    @PostMapping("/enriquecido")
+    public ResponseEntity<ResponseKafkaDto> transferFailed(@RequestBody AchCashOutEnrichedEvent event) {
+        kafkaProducer.addEnriquecido(event);
+        return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+
+    @PostMapping("/cashout-ncb")
+    public ResponseEntity<ResponseKafkaDto> transferCashoutNcb(@RequestBody TransferCashOutEvent event) {
+        kafkaProducer.addCashOutNCB(event);
+        return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+
+    @PostMapping("/update-transfer-status")
+    public ResponseEntity<ResponseKafkaDto> transferCashoutNcb(@RequestBody BalanceUpdateEvent event) {
+        kafkaProducer.updateTransferStatus(event);
+        return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+
+    @PostMapping("/ach-completed")
+    public ResponseEntity<ResponseKafkaDto> transferAchCompleted(@RequestBody AchTransferCompletedEvent event) {
+        kafkaProducer.sendAchTransferCompleted(event);
+        return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
     }
 }

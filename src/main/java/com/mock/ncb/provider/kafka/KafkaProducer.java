@@ -1,11 +1,17 @@
 package com.mock.ncb.provider.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mock.ncb.event.AchCashOutEnrichedEvent;
+import com.mock.ncb.event.AchTransferCompletedEvent;
+import com.mock.ncb.event.BalanceNCBCashInEvent;
 import com.mock.ncb.event.BalanceTransferP2PEvent;
+import com.mock.ncb.event.BalanceUpdateEvent;
+import com.mock.ncb.event.EcommerceCashInEvent;
 import com.mock.ncb.event.FirstAccountBalanceEvent;
 import com.mock.ncb.event.LedgerAccountCreatedEvent;
 import com.mock.ncb.event.MessageCreatedEvent;
 import com.mock.ncb.event.TransferApprovedEvent;
+import com.mock.ncb.event.TransferCashOutEvent;
 import com.mock.ncb.event.TransferRejectedEvent;
 import com.mock.ncb.event.TransferTopUpEvent;
 import com.mock.ncb.event.UserActivatedEvent;
@@ -133,7 +139,7 @@ public class KafkaProducer {
 		kafkaTemplate.send("NCB_OPERATIONS", cloudEvent);
 		log.info("Message published!");
 	}
-	
+
 	public void transferApprove(TransferApprovedEvent event) {
 		CloudEvent cloudEvent = CloudEventBuilder.v1()
 				.withExtension("payloadversion", "0.0.1")
@@ -147,7 +153,7 @@ public class KafkaProducer {
 		kafkaTemplate.send("ACCOUNTS", cloudEvent);
 		log.info("Message published!");
 	}
-	
+
 	public void transferFailed(TransferRejectedEvent event) {
 		CloudEvent cloudEvent = CloudEventBuilder.v1()
 				.withExtension("payloadversion", "0.0.1")
@@ -159,6 +165,91 @@ public class KafkaProducer {
 				.withData(PojoCloudEventData.wrap(event, objectMapper::writeValueAsBytes))
 				.build();
 		kafkaTemplate.send("ACCOUNTS", cloudEvent);
+		log.info("Message published!");
+	}
+
+	public void addBalanceETop(EcommerceCashInEvent event) {
+		CloudEvent cloudEvent = CloudEventBuilder.v1()
+				.withExtension("payloadversion", "0.0.1")
+				.withId(UUID.randomUUID().toString())
+				.withType("team.nautilus.event.transfer.etop")
+				.withSource(URI.create("/nautilus_core/ecommerce_bff"))
+				.withDataContentType("application/json")
+				.withTime(Instant.now().atOffset(ZoneOffset.UTC))
+				.withData(PojoCloudEventData.wrap(event, objectMapper::writeValueAsBytes))
+				.build();
+		kafkaTemplate.send("TRANSFER", cloudEvent);
+		log.info("Message published!");
+	}
+
+	public void addBalanceCashIn(BalanceNCBCashInEvent event) {
+		CloudEvent cloudEvent = CloudEventBuilder.v1()
+				.withExtension("payloadversion", "0.0.2")
+				.withId(UUID.randomUUID().toString())
+				.withType("team.nautilus.event.balance.ncb.topup")
+				.withSource(URI.create("/nautilus_core/ecommerce_bff"))
+				.withDataContentType("application/json")
+				.withTime(Instant.now().atOffset(ZoneOffset.UTC))
+				.withData(PojoCloudEventData.wrap(event, objectMapper::writeValueAsBytes))
+				.build();
+		kafkaTemplate.send("BALANCE", cloudEvent);
+		log.info("Message published!");
+	}
+
+	public void addEnriquecido(AchCashOutEnrichedEvent event) {
+		CloudEvent cloudEvent = CloudEventBuilder.v1()
+				.withExtension("payloadversion", "0.0.1")
+				.withId(UUID.randomUUID().toString())
+				.withType("team.nautilus.event.ach.cashout.enriched")
+				.withSource(URI.create("/nautilus_core/dummy"))
+				.withDataContentType("application/json")
+				.withTime(Instant.now().atOffset(ZoneOffset.UTC))
+				.withData(PojoCloudEventData.wrap(event, objectMapper::writeValueAsBytes))
+				.build();
+		kafkaTemplate.send("ACCOUNTS", cloudEvent);
+		log.info("Message published!");
+	}
+
+
+	public void addCashOutNCB(TransferCashOutEvent event) {
+		CloudEvent cloudEvent = CloudEventBuilder.v1()
+				.withExtension("payloadversion", "0.0.1")
+				.withId(UUID.randomUUID().toString())
+				.withType("team.nautilus.event.balance.ncb.debit")
+				.withSource(URI.create("/nautilus_core/dummy"))
+				.withDataContentType("application/json")
+				.withTime(Instant.now().atOffset(ZoneOffset.UTC))
+				.withData(PojoCloudEventData.wrap(event, objectMapper::writeValueAsBytes))
+				.build();
+		kafkaTemplate.send("BALANCE", cloudEvent);
+		log.info("Message published!");
+	}
+
+	public void updateTransferStatus(BalanceUpdateEvent event) {
+		CloudEvent cloudEvent = CloudEventBuilder.v1()
+				.withExtension("payloadversion", "0.0.2")
+				.withId(UUID.randomUUID().toString())
+				.withType("team.nautilus.event.transfer.balance.update")
+				.withSource(URI.create("/nautilus_core/dummy"))
+				.withDataContentType("application/json")
+				.withTime(Instant.now().atOffset(ZoneOffset.UTC))
+				.withData(PojoCloudEventData.wrap(event, objectMapper::writeValueAsBytes))
+				.build();
+		kafkaTemplate.send("BALANCE", cloudEvent);
+		log.info("Message published!");
+	}
+
+	public void sendAchTransferCompleted(AchTransferCompletedEvent event) {
+		CloudEvent cloudEvent = CloudEventBuilder.v1()
+				.withExtension("payloadversion", "0.0.2")
+				.withId(UUID.randomUUID().toString())
+				.withType("team.nautilus.event.ach.transfer.completed")
+				.withSource(URI.create("/nautilus_core/dummy"))
+				.withDataContentType("application/json")
+				.withTime(Instant.now().atOffset(ZoneOffset.UTC))
+				.withData(PojoCloudEventData.wrap(event, objectMapper::writeValueAsBytes))
+				.build();
+		kafkaTemplate.send("NCB_OPERATIONS", cloudEvent);
 		log.info("Message published!");
 	}
 }
