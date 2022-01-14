@@ -7,7 +7,7 @@ spring:
     bootstrap-servers: nt-use1-qa-ehn-eh1.servicebus.windows.net:9093
     client-id: stream-processor-accounts-local
     properties:
-      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="$ConnectionString" password="Endpoint=sb://nt-use1-prod-ehn-eh1.servicebus.windows.net/;SharedAccessKeyName=supportConnectionString;SharedAccessKey=0fLdZbSEB1NCiesoc2z91fycELiPtdLwkVlfCbxZO6E=";
+      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="$ConnectionString" password="Endpoint=sb://nt-use1-qa-ehn-eh1.servicebus.windows.net/;SharedAccessKeyName=temporalAccess;SharedAccessKey=W2HG8FkO2zCMKQQp719UUqVlUO2KTgD3+uiwCVGs4KU=";
       sasl.mechanism: PLAIN
       security.protocol: SASL_SSL
     consumer:
