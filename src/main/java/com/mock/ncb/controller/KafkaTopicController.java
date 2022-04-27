@@ -1,14 +1,19 @@
 package com.mock.ncb.controller;
 
 import com.mock.ncb.dto.ResponseKafkaDto;
+import com.mock.ncb.event.AbmCashOutTransfersEvent;
+import com.mock.ncb.event.AbmCashOutTransfersFailedEvent;
 import com.mock.ncb.event.AchCashOutEnrichedEvent;
 import com.mock.ncb.event.AchTransferCompletedEvent;
 import com.mock.ncb.event.BalanceNCBCashInEvent;
 import com.mock.ncb.event.BalanceTransferP2PEvent;
 import com.mock.ncb.event.BalanceUpdateEvent;
 import com.mock.ncb.event.EcommerceCashInEvent;
+import com.mock.ncb.event.FeeSavedEvent;
 import com.mock.ncb.event.FirstAccountBalanceEvent;
 import com.mock.ncb.event.LedgerAccountCreatedEvent;
+import com.mock.ncb.event.MTopBalanceDebitedEvent;
+import com.mock.ncb.event.MTopTransferEvent;
 import com.mock.ncb.event.MessageCreatedEvent;
 import com.mock.ncb.event.TransferApprovedEvent;
 import com.mock.ncb.event.TransferCashOutEvent;
@@ -122,4 +127,35 @@ public class KafkaTopicController {
         kafkaProducer.sendAchTransferCompleted(event);
         return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
     }
+
+    @PostMapping("/abm-debit-ok")
+    public ResponseEntity<ResponseKafkaDto> transferAchCompleted(@RequestBody AbmCashOutTransfersEvent event) {
+        kafkaProducer.sendAbmCashoutEvent(event);
+        return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+
+    @PostMapping("/abm-debit-error")
+    public ResponseEntity<ResponseKafkaDto> transferAchCompleted(@RequestBody AbmCashOutTransfersFailedEvent event) {
+        kafkaProducer.sendAbmCashoutFailedEvent(event);
+        return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+
+    @PostMapping("/fee")
+    public ResponseEntity<ResponseKafkaDto> fee(@RequestBody FeeSavedEvent event) {
+        kafkaProducer.sendFee(event);
+        return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+
+    @PostMapping("/fee-enriched")
+    public ResponseEntity<ResponseKafkaDto> feeEnriched(@RequestBody MTopBalanceDebitedEvent event) {
+        kafkaProducer.sendFeeEnriched(event);
+        return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+
+    @PostMapping("/balance-mtop")
+    public ResponseEntity<ResponseKafkaDto> feeEnriched(@RequestBody MTopTransferEvent event) {
+        kafkaProducer.sendMTopBalance(event);
+        return ResponseEntity.ok().body(ResponseKafkaDto.builder().status(200).build());
+    }
+
 }
